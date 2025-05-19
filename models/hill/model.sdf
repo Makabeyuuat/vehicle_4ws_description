@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<sdf version="1.6">
+  <model name="hill">
+    <static>true</static>
+    <link name="hill_link">
+      <visual name="hill_visual">
+        <geometry>
+          <mesh>
+            <uri>model://hill/meshes/hill.stl</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name="hill_collision">
+        <geometry>
+          <mesh>
+            <uri>model://hill/meshes/hill.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+    </link>
+  </model>
+</sdf>

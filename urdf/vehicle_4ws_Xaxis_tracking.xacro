@@ -1,0 +1,355 @@
+<?xml version="1.0" ?>
+<robot name="vehicle_4ws" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+<xacro:property name="PI" value="3.1415926535897932384626433832795028841971" />
+<xacro:property name="gravitational_acceleration" value="9.8" />
+<xacro:property name="vehicle1_Yaw" value="-PI/4" />
+
+<!-- 荷台と連結点のmass -->
+<xacro:property name="fusion_vehicle_body_mass" value="2113.272311120373" /> 
+<xacro:property name="vehicle_body_mass" value="313.272311120373" /> 
+<xacro:property name="vehicle_inertia_coef" value="${vehicle_body_mass/fusion_vehicle_body_mass}" /> 
+
+<xacro:property name="wheel_mass" value="4.639715839283939" /> 
+
+<!-- frontは受動車輪なので低めに設定 -->
+<xacro:property name="front_wheel_joint_damping" value="0.1"/>
+<xacro:property name="front_wheel_joint_mu" value="0.001" />
+<xacro:property name="front_wheel_joint_friction" value="${front_wheel_joint_mu* gravitational_acceleration * wheel_mass  }" /> 
+<xacro:property name="front_steering_damping" value="5.0" />
+<xacro:property name="front_steering_mu" value="0.001" />
+<xacro:property name="front_steering_friction" value="${front_steering_mu * gravitational_acceleration * 0.25*vehicle_body_mass}" />
+
+<!-- rearは駆動輪なので、入力以外で動かないように設定 -->
+<xacro:property name="wheel_joint_damping" value="5.0"/>
+<xacro:property name="wheel_joint_mu" value="0.1" />
+<xacro:property name="wheel_joint_friction" value="${wheel_joint_mu* gravitational_acceleration * wheel_mass }" /> 
+<xacro:property name="steering_damping" value="20.0" />
+<xacro:property name="steering_mu" value="0.5" />
+<xacro:property name="steering_friction" value="${steering_mu * gravitational_acceleration * 0.25*vehicle_body_mass}" />
+
+<!-- rotationは共通 -->
+<xacro:property name="rotational_joint_damping" value="0.01" />
+<xacro:property name="rotational_joint_mu" value="0.001" />
+<xacro:property name="rotational_joint_friction" value="${rotational_joint_mu * gravitational_acceleration}" />
+
+<xacro:include filename="$(find vehicle_4ws_description)/urdf/materials.xacro" />
+<xacro:include filename="$(find vehicle_4ws_description)/urdf/vehicle_4ws.trans" />
+<xacro:include filename="$(find vehicle_4ws_description)/urdf/vehicle_4ws.gazebo" />
+
+<link name="base_link"/>
+
+<link name="body_link">
+  <inertial>
+    <origin xyz="0.001411408730126027 0.05751189617802702 0.0" rpy="0 0 0"/>
+    <mass value="${vehicle_body_mass}"/>
+    <inertia ixx="${vehicle_inertia_coef*114.688091}" iyy="${vehicle_inertia_coef*336.418835}" izz="${vehicle_inertia_coef*418.647558}" ixy="${vehicle_inertia_coef*0.010139}" iyz="${vehicle_inertia_coef*0.002956}" ixz="${-vehicle_inertia_coef*0.33997}"/>
+  </inertial>
+  <visual>
+    <origin xyz="0 0 -0.376" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://vehicle_4ws_description/meshes/base_link.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="_"/>
+  </visual>
+  <collision>
+    <origin xyz="0 0 -0.376" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://vehicle_4ws_description/meshes/base_link.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<link name="v1_rear_1">
+  <inertial>
+    <origin xyz="2.514264385022891e-07 2.540692383215526e-07 -0.014912246259012996" rpy="0 0 0"/>
+    <mass value="12.646385127140846"/>
+    <inertia ixx="0.752015" iyy="0.005192" izz="0.755318" ixy="0.0" iyz="0.0" ixz="-0.0"/>
+  </inertial>
+  <visual>
+    <origin xyz="0.44955 -0.05752 -0.376" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://vehicle_4ws_description/meshes/v1_rear_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="_"/>
+  </visual>
+  <collision>
+    <origin xyz="0.44955 -0.05752 -0.376" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://vehicle_4ws_description/meshes/v1_rear_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<link name="v1_front_1">
+  <inertial>
+    <origin xyz="2.5142643794717756e-07 2.540691661362393e-07 -0.014912246259013162" rpy="0 0 0"/>
+    <mass value="12.64638512714101"/>
+    <inertia ixx="0.752015" iyy="0.005192" izz="0.755318" ixy="-0.0" iyz="0.0" ixz="-0.0"/>
+  </inertial>
+  <visual>
+    <origin xyz="-0.45045 -0.05752 -0.376" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://vehicle_4ws_description/meshes/v1_front_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="_"/>
+  </visual>
+  <collision>
+    <origin xyz="-0.45045 -0.05752 -0.376" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://vehicle_4ws_description/meshes/v1_front_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<link name="new_hinge_1">
+  <inertial>
+    <origin xyz="-6.714468377522209e-05 2.5406917214532143e-07 -0.11523004751915897" rpy="0 0 0"/>
+    <mass value="4.884144703315957"/>
+    <inertia ixx="0.039519" iyy="0.032652" izz="0.021551" ixy="0.0" iyz="0.0" ixz="-3e-05"/>
+  </inertial>
+  <visual>
+    <origin xyz="-0.45045 0.34248 -0.356" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://vehicle_4ws_description/meshes/new_hinge_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="_"/>
+  </visual>
+  <collision>
+    <origin xyz="-0.45045 0.34248 -0.356" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://vehicle_4ws_description/meshes/new_hinge_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<link name="new_wheel_1">
+  <inertial>
+    <origin xyz="3.1709373395083507e-05 2.540692010666312e-07 0.00021681028363659816" rpy="0 0 0"/>
+    <mass value="4.639715839283939"/>
+    <inertia ixx="0.029034" iyy="0.053334" izz="0.029034" ixy="-0.0" iyz="0.0" ixz="0.0"/>
+  </inertial>
+  <visual>
+    <origin xyz="-0.450031 0.34248 -0.150215" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://vehicle_4ws_description/meshes/new_wheel_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="_"/>
+  </visual>
+  <collision>
+    <origin xyz="-0.450031 0.34248 -0.150215" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://vehicle_4ws_description/meshes/new_wheel_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<link name="new_wheel_2">
+  <inertial>
+    <origin xyz="3.1709373397914575e-05 2.5406927345317243e-07 0.00021681028363673693" rpy="0 0 0"/>
+    <mass value="4.639715839283939"/>
+    <inertia ixx="0.029034" iyy="0.053334" izz="0.029034" ixy="0.0" iyz="0.0" ixz="0.0"/>
+  </inertial>
+  <visual>
+    <origin xyz="0.449969 0.34248 -0.150215" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://vehicle_4ws_description/meshes/new_wheel_2.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="_"/>
+  </visual>
+  <collision>
+    <origin xyz="0.449969 0.34248 -0.150215" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://vehicle_4ws_description/meshes/new_wheel_2.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<link name="new_hinge_3">
+  <inertial>
+    <origin xyz="-6.714468377522209e-05 2.5406917258941064e-07 -0.11523004751915977" rpy="0 0 0"/>
+    <mass value="4.884144703315957"/>
+    <inertia ixx="0.039519" iyy="0.032652" izz="0.021551" ixy="-0.0" iyz="0.0" ixz="-3e-05"/>
+  </inertial>
+  <visual>
+    <origin xyz="-0.45045 -0.45752 -0.356" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://vehicle_4ws_description/meshes/new_hinge_3.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="_"/>
+  </visual>
+  <collision>
+    <origin xyz="-0.45045 -0.45752 -0.356" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://vehicle_4ws_description/meshes/new_hinge_3.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<link name="new_wheel_3">
+  <inertial>
+    <origin xyz="3.1709373395083507e-05 2.540692015662316e-07 0.00021681028363579324" rpy="0 0 0"/>
+    <mass value="4.639715839283939"/>
+    <inertia ixx="0.029034" iyy="0.053334" izz="0.029034" ixy="0.0" iyz="0.0" ixz="0.0"/>
+  </inertial>
+  <visual>
+    <origin xyz="-0.450031 -0.45752 -0.150215" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://vehicle_4ws_description/meshes/new_wheel_3.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="_"/>
+  </visual>
+  <collision>
+    <origin xyz="-0.450031 -0.45752 -0.150215" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://vehicle_4ws_description/meshes/new_wheel_3.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<link name="new_wheel_4">
+  <inertial>
+    <origin xyz="3.170937339708191e-05 2.540692737307282e-07 0.00021681028363593202" rpy="0 0 0"/>
+    <mass value="4.639715839283939"/>
+    <inertia ixx="0.029034" iyy="0.053334" izz="0.029034" ixy="0.0" iyz="0.0" ixz="0.0"/>
+  </inertial>
+  <visual>
+    <origin xyz="0.449969 -0.45752 -0.150215" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://vehicle_4ws_description/meshes/new_wheel_4.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="_"/>
+  </visual>
+  <collision>
+    <origin xyz="0.449969 -0.45752 -0.150215" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://vehicle_4ws_description/meshes/new_wheel_4.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<link name="new_hinge_2">
+  <inertial>
+    <origin xyz="-6.714468377322369e-05 2.540692444763515e-07 -0.1152300475191588" rpy="0 0 0"/>
+    <mass value="4.884144703315957"/>
+    <inertia ixx="0.039519" iyy="0.032652" izz="0.021551" ixy="0.0" iyz="0.0" ixz="-3e-05"/>
+  </inertial>
+  <visual>
+    <origin xyz="0.44955 0.34248 -0.356" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://vehicle_4ws_description/meshes/new_hinge_2.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="_"/>
+  </visual>
+  <collision>
+    <origin xyz="0.44955 0.34248 -0.356" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://vehicle_4ws_description/meshes/new_hinge_2.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<link name="new_hinge_4">
+  <inertial>
+    <origin xyz="-6.714468377405636e-05 2.5406924475390724e-07 -0.11523004751915963" rpy="0 0 0"/>
+    <mass value="4.884144703315957"/>
+    <inertia ixx="0.039519" iyy="0.032652" izz="0.021551" ixy="0.0" iyz="0.0" ixz="-3e-05"/>
+  </inertial>
+  <visual>
+    <origin xyz="0.44955 -0.45752 -0.356" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://vehicle_4ws_description/meshes/new_hinge_4.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="_"/>
+  </visual>
+  <collision>
+    <origin xyz="0.44955 -0.45752 -0.356" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://vehicle_4ws_description/meshes/new_hinge_4.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+  </collision>
+</link>
+
+<joint name="body" type="fixed">
+  <origin xyz="0 0 0.376" rpy="0 0 0"/>
+  <parent link="base_link"/>
+  <child link="body_link"/>
+</joint>
+
+<joint name="v1_body_to_rear" type="fixed">
+  <origin xyz="-0.44955 0.05752 0" rpy="0 0 0"/>
+  <parent link="body_link"/>
+  <child link="v1_rear_1"/>
+</joint>
+
+<joint name="v1_body_to_front" type="fixed">
+  <origin xyz="0.45045 0.05752 0" rpy="0 0 0"/>
+  <parent link="body_link"/>
+  <child link="v1_front_1"/>
+</joint>
+
+<joint name="front_right_steering" type="revolute">
+  <origin xyz="0.0 -0.4 -0.02" rpy="0 0 0"/>
+  <parent link="v1_front_1"/>
+  <child link="new_hinge_1"/>
+  <dynamics damping="${front_steering_damping}" friction="${front_steering_friction}"/>
+  <axis xyz="0.0 0.0 1.0"/>
+  <limit upper="1.5708" lower="-1.5708" effort="10" velocity="10"/>
+</joint>
+
+<joint name="front_right_wheel" type="continuous">
+  <origin xyz="-0.000419 0.0 -0.205785" rpy="0 0 0"/>
+  <parent link="new_hinge_1"/>
+  <child link="new_wheel_1"/>
+  <dynamics damping="${front_wheel_joint_damping}" friction="${front_wheel_joint_friction}"/>
+  <axis xyz="0.0 1.0 -0.0"/>
+</joint>
+
+<joint name="rear_right_wheel" type="continuous">
+  <origin xyz="-0.000419 0.0 -0.205785" rpy="0 0 0"/>
+  <parent link="new_hinge_2"/>
+  <child link="new_wheel_2"/>
+  <dynamics damping="${wheel_joint_damping}" friction="${wheel_joint_friction}"/>
+  <limit effort="10" velocity="10"/>
+  <axis xyz="0.0 1.0 -0.0"/>
+</joint>
+
+<joint name="front_left_steering" type="revolute">
+  <origin xyz="0.0 0.4 -0.02" rpy="0 0 0"/>
+  <parent link="v1_front_1"/>
+  <child link="new_hinge_3"/>
+  <dynamics damping="${front_steering_damping}" friction="${front_steering_friction}"/>
+  <axis xyz="0.0 0.0 1.0"/>
+  <limit upper="1.5708" lower="-1.5708" effort="10" velocity="10"/>
+</joint>
+
+<joint name="front_left_wheel" type="continuous">
+  <origin xyz="-0.000419 0.0 -0.205785" rpy="0 0 0"/>
+  <parent link="new_hinge_3"/>
+  <child link="new_wheel_3"/>
+  <dynamics damping="${front_wheel_joint_damping}" friction="${front_wheel_joint_friction}"/>
+  <axis xyz="0.0 1.0 -0.0"/>
+</joint>
+
+<joint name="rear_left_wheel" type="continuous">
+  <origin xyz="-0.000419 0.0 -0.205785" rpy="0 0 0"/>
+  <parent link="new_hinge_4"/>
+  <child link="new_wheel_4"/>
+  <dynamics damping="${wheel_joint_damping}" friction="${wheel_joint_friction}"/>
+  <limit effort="10" velocity="10"/>
+  <axis xyz="0.0 1.0 -0.0"/>
+</joint>
+
+<joint name="rear_to_Rsteering" type="fixed">
+  <origin xyz="0.0 -0.4 -0.02" rpy="0 0 0"/>
+  <parent link="v1_rear_1"/>
+  <child link="new_hinge_2"/>
+</joint>
+
+<joint name="rear_to_Lsteering" type="fixed">
+  <origin xyz="0.0 0.4 -0.02" rpy="0 0 0"/>
+  <parent link="v1_rear_1"/>
+  <child link="new_hinge_4"/>
+</joint>
+
+</robot>

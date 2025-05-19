@@ -1,0 +1,60 @@
+<launch>
+  <!-- Gazebo の Empty World を読み込む -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value=""/>
+    <arg name="paused" value="false"/>
+    <arg name="use_sim_time" value="true"/>
+    <arg name="gui" value="true"/>
+    <arg name="headless" value="false"/>
+    <arg name="debug" value="false"/>
+  </include>
+
+  <!-- vehicle_4ws モデル: 名前空間 vehicle_4ws で URDF とコントローラ設定を適用 -->
+  <group ns="vehicle_4ws">
+    <!-- xacro から URDF を展開し /vehicle_4ws/robot_description に登録 -->
+    <param name="robot_description"
+           command="$(find xacro)/xacro '$(find vehicle_4ws_description)/urdf/vehicle_4ws.xacro'"/>
+
+    <!-- controller.yaml を /vehicle_4ws スコープでロード -->
+            <!-- コントローラ設定を vehicle_4ws namespace にロード -->
+    <rosparam ns="vehicle_4ws" file="$(find vehicle_4ws_description)/config/controller.yaml" command="load"/>
+    <!-- スポーナーを vehicle_4ws namespace で起動。引数は一行で指定 -->
+    <node name="controller_spawner"
+          pkg="controller_manager"
+          type="spawner"
+          respawn="false"
+          output="screen"
+          ns="vehicle_4ws"
+          args="joint_state_controller front_right_steering_position_controller front_left_steering_position_controller front_right_wheel_velocity_controller front_left_wheel_velocity_controller rear_right_wheel_velocity_controller rear_left_wheel_velocity_controller"/>
+  </group>
+
+  <!-- hill モデル: TF不要、単にスポーン -->
+  <param name="/hill/robot_description"
+         command="$(find xacro)/xacro '$(find hill_description)/urdf/hill.xacro'"/>
+  <node pkg="gazebo_ros"
+        type="spawn_model"
+        name="spawn_hill"
+        output="screen"
+        args="-param /hill/robot_description -urdf -model hill -x 1 -y 0 -z 0"/>
+
+  <!-- vehicle_4ws用の動的TFを出力 -->
+  <node pkg="robot_state_publisher"
+        type="robot_state_publisher"
+        name="vehicle_state_publisher"
+        output="screen">
+    <!-- URDF を再度展開 -->
+    <param name="robot_description"
+           command="$(find xacro)/xacro '$(find vehicle_4ws_description)/urdf/vehicle_4ws.xacro'"/>
+    <!-- joint_states を vehicle_4ws 名前空間内のトピックにリマップ -->
+    <remap from="/joint_states" to="/vehicle_4ws/joint_states"/>
+    <!-- フレーム名衝突回避のためプレフィックス -->
+    <param name="tf_prefix" value="vehicle_4ws"/>
+  </node>
+
+  <!-- RViz を起動 -->
+  <node pkg="rviz"
+        type="rviz"
+        name="rviz"
+        output="screen"
+        args="-d $(find vehicle_4ws_description)/rviz/spawn_two_models.rviz"/>
+</launch>

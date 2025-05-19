@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<sdf version="1.6">
+  <world name="default">
+    <include><uri>model://ground_plane</uri></include>
+    <include><uri>model://sun</uri></include>
+
+    <!-- Path プラグイン (gazebo_ros_paths_plugin.so) の読み込み -->
+    <plugin name="gazebo_ros_paths_plugin"
+            filename="libgazebo_ros_paths_plugin.so">
+      <!-- PoseArray を出すトピック名 -->
+      <topicName>/trajectory</topicName>
+      <!-- ワールドのフレーム名 -->
+      <frameName>world</frameName>
+      <!-- 表示色 RGBA -->
+      <color>0 1 0 1</color>
+      <!-- 線の太さ [m] -->
+      <lineWidth>0.02</lineWidth>
+    </plugin>
+  </world>
+</sdf>

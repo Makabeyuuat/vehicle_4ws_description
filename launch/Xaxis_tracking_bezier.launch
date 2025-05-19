@@ -1,0 +1,47 @@
+<launch>
+  <!-- (A) worlds/ を Gazebo の検索パスに追加 -->
+  <env name="GAZEBO_RESOURCE_PATH"
+       value="$(optenv GAZEBO_RESOURCE_PATH):$(find vehicle_4ws_description)/worlds"/>
+
+  <!-- (B) marker.world を相対パスで指定 -->
+  <arg name="world_name" default="marker.world"/>
+
+  <!-- (C) Gazebo を起動 -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name"   value="$(arg world_name)"/>
+    <arg name="paused"       value="false"/>
+    <arg name="use_sim_time" value="true"/>
+    <arg name="gui"          value="true"/>
+  </include>
+
+  <!-- (D) URDF → robot_description -->
+  <param name="robot_description"
+         command="$(find xacro)/xacro '$(find vehicle_4ws_description)/urdf/vehicle_4ws_Xaxis_tracking.xacro'"/>
+
+  <!-- (E) モデルを spawn -->
+  <node pkg="gazebo_ros" type="spawn_model" name="spawn_urdf" output="screen"
+        args="-param robot_description -urdf -model vehicle_4ws
+              -x -6.5 -y -1.0 -z 0.05 -Y 0.0"/>
+
+  <!-- (F) PoseArray → Path プラグイン用ノード -->
+  <node pkg="vehicle_4ws_description" type="trajectory_path_publisher"
+        name="trajectory_path_publisher" output="screen"/>
+
+  <!-- (G) controllers, robot_state_publisher, RViz -->
+  <rosparam file="$(find vehicle_4ws_description)/config/controller.yaml" command="load"/>
+  <node name="controller_spawner" pkg="controller_manager" type="spawner"
+        ns="vehicle_4ws" output="screen"
+        args="joint_state_controller
+              front_right_steering_position_controller
+              front_right_wheel_velocity_controller
+              rear_right_wheel_velocity_controller
+              front_left_steering_position_controller
+              front_left_wheel_velocity_controller
+              rear_left_wheel_velocity_controller"/>
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"
+        output="screen">
+    <remap from="/joint_states" to="/vehicle_4ws/joint_states"/>
+  </node>
+  <arg name="rvizconfig" default="$(find vehicle_4ws_description)/rviz/urdf.rviz"/>
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" required="true"/>
+</launch>

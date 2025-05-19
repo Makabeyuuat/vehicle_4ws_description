@@ -1,0 +1,192 @@
+<?xml version="1.0" ?>
+<robot name="vehicle_4ws" xmlns:xacro="http://www.ros.org/wiki/xacro" >
+
+<xacro:property name="body_color" value="Gazebo/Red" />
+<xacro:property name="carrier" value="Gazebo/Yellow" />
+<xacro:property name="hinge" value="Gazebo/Silver" />
+<xacro:property name="sliding_machine" value="Gazebo/Orange" />
+<xacro:property name="wheel" value="Gazebo/Gray" />
+
+<gazebo>
+    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+    <robotNamespace>/vehicle_4ws</robotNamespace>
+    <robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
+    <legacyModeNS>true</legacyModeNS>
+    </plugin>
+</gazebo>
+
+<!-- 各リンクの絶対座標を取得するためのプラグイン -->
+<gazebo>
+  <plugin name="ground_truth" filename="libgazebo_ros_p3d.so">
+    <robotNamespace>/vehicle_4ws</robotNamespace>
+    <bodyName>base_link</bodyName>
+    <frameName>world</frameName>
+    <topicName>true_base_link</topicName>
+  </plugin>
+</gazebo>
+
+<gazebo>
+  <plugin name="ground_truth" filename="libgazebo_ros_p3d.so">
+    <robotNamespace>/vehicle_4ws</robotNamespace>
+    <bodyName>body_link</bodyName>
+    <frameName>world</frameName>
+    <topicName>true_body_link</topicName>
+  </plugin>
+</gazebo>
+
+<gazebo>
+  <plugin name="ground_truth" filename="libgazebo_ros_p3d.so">
+    <robotNamespace>/vehicle_4ws</robotNamespace>
+    <bodyName>new_hinge_1</bodyName>
+    <frameName>world</frameName>
+    <topicName>true_front_right_steering_link</topicName>
+  </plugin>
+</gazebo>
+
+<gazebo>
+  <plugin name="ground_truth" filename="libgazebo_ros_p3d.so">
+    <robotNamespace>/vehicle_4ws</robotNamespace>
+    <bodyName>new_hinge_3</bodyName>
+    <frameName>world</frameName>
+    <topicName>true_front_left_steering_link</topicName>
+  </plugin>
+</gazebo>
+
+<gazebo>
+  <plugin name="ground_truth" filename="libgazebo_ros_p3d.so">
+    <robotNamespace>/vehicle_4ws</robotNamespace>
+    <bodyName>new_hinge_2</bodyName>
+    <frameName>world</frameName>
+    <topicName>true_rear_right_steering_link</topicName>
+  </plugin>
+</gazebo>
+
+<gazebo>
+  <plugin name="ground_truth" filename="libgazebo_ros_p3d.so">
+    <robotNamespace>/vehicle_4ws</robotNamespace>
+    <bodyName>new_hinge_4</bodyName>
+    <frameName>world</frameName>
+    <topicName>true_rear_left_steering_link</topicName>
+  </plugin>
+</gazebo>
+
+
+<gazebo>
+  <plugin name="plot3d_trajectory" filename="libLinkPlot3DPlugin.so">
+    <!-- 軌跡更新頻度（Hz） -->
+    <frequency>30</frequency>
+
+    <!-- 描画したいリンクごとに <plot> を定義 -->
+    <plot>
+      <!-- モデル名::リンク名 -->
+      <link>vehicle_4ws::base_link</link>
+      <!-- リンク座標系に対するオフセット(x y z roll pitch yaw) -->
+      <pose>-0.5 0 0.01 0 0 0</pose>
+      <!-- Gazebo 内定義済みマテリアル -->
+      <material>Gazebo/Red</material>
+    </plot>
+
+    <plot>
+      <link>vehicle_4ws::new_wheel_1</link>
+      <pose>0 0 0 0 0 0</pose>
+      <material>Gazebo/Blue</material>
+    </plot>
+
+    <plot>
+      <link>vehicle_4ws::new_wheel_3</link>
+      <pose>0 0 0 0 0 0</pose>
+      <material>Gazebo/Blue</material>
+    </plot>
+    
+    <plot>
+      <link>vehicle_4ws::v1_front_1</link>
+      <pose>0 0 0 0 0 0</pose>
+      <material>Gazebo/Blue</material>
+    </plot>
+
+    <!-- 必要に応じてさらに <plot> を追加 -->
+  </plugin>
+</gazebo>
+
+
+<gazebo reference="body_link">
+  <material>${body_color}</material>
+  <mu1>0.2</mu1>
+  <mu2>0.2</mu2>
+  <selfCollide>true</selfCollide>
+  <gravity>true</gravity>
+</gazebo>
+
+<gazebo reference="v1_rear_1">
+  <material>${body_color}</material>
+  <mu1>0.2</mu1>
+  <mu2>0.2</mu2>
+  <selfCollide>true</selfCollide>
+</gazebo>
+
+<gazebo reference="v1_front_1">
+  <material>${body_color}</material>
+  <mu1>0.2</mu1>
+  <mu2>0.2</mu2>
+  <selfCollide>true</selfCollide>
+</gazebo>
+
+<gazebo reference="new_hinge_1">
+  <material>${hinge}</material>
+  <mu1>0.2</mu1>
+  <mu2>0.2</mu2>
+  <selfCollide>false</selfCollide>
+</gazebo>
+
+<gazebo reference="new_wheel_1">
+  <material>${wheel}</material>
+  <mu1>0.8</mu1>
+  <mu2>0.8</mu2>
+  <selfCollide>false</selfCollide>
+</gazebo>
+
+<gazebo reference="new_wheel_2">
+  <material>${wheel}</material>
+  <mu1>0.8</mu1>
+  <mu2>0.8</mu2>
+  <selfCollide>true</selfCollide>
+</gazebo>
+
+<gazebo reference="new_hinge_3">
+  <material>${hinge}</material>
+  <mu1>0.2</mu1>
+  <mu2>0.2</mu2>
+  <selfCollide>false</selfCollide>
+</gazebo>
+
+<gazebo reference="new_wheel_3">
+  <material>${wheel}</material>
+  <mu1>0.8</mu1>
+  <mu2>0.8</mu2>
+  <selfCollide>false</selfCollide>
+</gazebo>
+
+<gazebo reference="new_wheel_4">
+  <material>${wheel}</material>
+  <mu1>0.8</mu1>
+  <mu2>0.8</mu2>
+  <selfCollide>true</selfCollide>
+</gazebo>
+
+<gazebo reference="new_hinge_2">
+  <material>${hinge}</material>
+  <mu1>0.2</mu1>
+  <mu2>0.2</mu2>
+  <selfCollide>true</selfCollide>
+</gazebo>
+
+<gazebo reference="new_hinge_4">
+  <material>${hinge}</material>
+  <mu1>0.2</mu1>
+  <mu2>0.2</mu2>
+  <selfCollide>true</selfCollide>
+</gazebo>
+
+
+
+</robot>
