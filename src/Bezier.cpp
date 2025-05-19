@@ -5,7 +5,6 @@
 #include "initial.hpp"
 
 
-//?x?W?F???
 double Rx(double* b, double* q, int j) {
 	int i;
 	double ret = 0.0;

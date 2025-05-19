@@ -1,6 +1,5 @@
 #define _CRT_SECURE_NO_WARNINGS
 
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -24,7 +23,7 @@ int main(int argc, char** argv) {
     ros::init(argc, argv, "steering_desired_controller");
     ros::NodeHandle nh;
 
-    // ← ここで joint_states も購読します
+    // jointをsubscribe
     ros::Subscriber joint_state_sub    = nh.subscribe("/vehicle_4ws/joint_states", 10, jointStateCallback);
     ros::Subscriber true_bodylink_sub = nh.subscribe("/vehicle_4ws/true_body_link", 10, trueBodyLinkCallback);
 	ros::Subscriber front_left_steering_sub = nh.subscribe("/vehicle_4ws/true_front_left_steering_link", 10, trueV1FrontLeftSteeringCallback);
@@ -96,8 +95,8 @@ int main(int argc, char** argv) {
 
 	//Gazeboのフィードバックをもとに計算
 	while(ros::ok()) {
-		double current_time = ros::Time::now().toSec();
 		//ROSのコールバックを処理
+		double current_time = ros::Time::now().toSec();
 		ros::spinOnce();
 	
 		//部分探索
@@ -125,38 +124,27 @@ int main(int argc, char** argv) {
         vehicle1.publishSteeringCommand(x_input[4],x_input[4]);
         vehicle1.publishWheelCommand(omega_rear[0], omega_rear[1]);
 
-
-		
+		// ループレートを維持
 		loop_rate.sleep();
-
 	}
-
 	return 0;
-
-
 }
 
 
 
 //Ps探索
 Search searchP(std::vector<double>& x) {
-
-
 	int i;
 	double dot = 0.0;
 	double dist = 0.0;
 	double dist0 = DBL_MAX;
 
-
 	for (i = 0; i < Q; i++) {
-
-
 		dot = (x[1] - R[i][0]) * (dRdq[i][0] / norm(Bx, By, qs, i)) + (x[2] - R[i][1]) * (dRdq[i][1] / norm(Bx, By, qs, i));
 
 		dist = sqrt(pow((x[1] - R[i][0]), 2) + pow((x[2] - R[i][1]), 2));
 
 		if (-0.0001 < dot && dot < 0.0001) {
-
 			if (dist < dist0) {
 				dist0 = dist;
 				sr.Psx = R[i][0];
@@ -166,14 +154,10 @@ Search searchP(std::vector<double>& x) {
 				sr.Cs1 = cs[i][1];
 				sr.Cs2 = cs[i][2];
 				sr.j = i;
-
 			}
-
 		}
 	}
-
 	return(sr);
-
 }
 
 Search searchPP(std::vector<double>& x) {
@@ -189,7 +173,6 @@ Search searchPP(std::vector<double>& x) {
 			dist = sqrt(pow((x[1] - R[i][0]), 2) + pow((x[2] - R[i][1]), 2));
 
 			if (-0.0001 < dot && dot < 0.0001) {
-
 				if (dist < dist0) {
 					dist0 = dist;
 					sr.Psx = R[i][0];
@@ -242,8 +225,5 @@ Search searchPP(std::vector<double>& x) {
 			}
 		}
 	}
-
-
 	return(sr);
-
 }
