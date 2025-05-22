@@ -11,6 +11,7 @@
 #include "callback.hpp"     // コールバック関数の宣言
 #include "initial.hpp"		// 初期値設定のヘッダーファイル
 #include "getInputValue.hpp"
+#include "dynamics_integrator.hpp"
 
 using namespace std;
 
@@ -23,19 +24,25 @@ Search searchPP(std::vector<double>& x);
 int main(int argc, char** argv) {
     ros::init(argc, argv, "steering_desired_controller");
     ros::NodeHandle nh;
-
-    // jointをsubscribe
+	ros::Rate loop_rate(100);
+	// jointをsubscribe
     ros::Subscriber joint_state_sub    = nh.subscribe("/vehicle_4ws/joint_states", 10, jointStateCallback);
     ros::Subscriber true_bodylink_sub = nh.subscribe("/vehicle_4ws/true_body_link", 10, trueBodyLinkCallback);
 	ros::Subscriber front_left_steering_sub = nh.subscribe("/vehicle_4ws/true_front_left_steering_link", 10, trueV1FrontLeftSteeringCallback);
 
+
+	PIDGains driveGains{1.0, 0.1, 0.01};  // (Kp, Ki, Kd)
+    PIDGains steerGains{0.5, 0.05, 0.005};
     // Vehicle クラスのインスタンス生成
     Vehicle vehicle1(nh, "v1");
-
-    ros::Rate loop_rate(100);
-
 	//制御入力のクラスをインスタンス化
 	getInputValue getInputValue(0.01);
+	//動力学計算のクラスをインスタンス化
+	DynamicsIntegrator integrator(
+        M_mass, I_theta, lv, GRAV, rho,
+        driveGains, steerGains,
+        0.01
+    );
 
 	//gazebo上の初期値をx_oldに代入
 	while (ros::ok() && !(got_body_pose && got_steering_pose)) {
@@ -44,6 +51,8 @@ int main(int argc, char** argv) {
 	}
 	//デバッグ用ログ出力
 	ROS_INFO("Locking initial pose and calling initial(): x=%.3f, y=%.3f, body_yaw=%.3f ,steering=%.3f",
+           true_body_pos[0], true_body_pos[1], true_body_yaw, true_steering);
+	ROS_INFO("Locking initial pose and calling initial(): xdot=%.3f, ydot=%.3f, thetadot=%.3f ,phidot=%.3f",
            true_body_pos[0], true_body_pos[1], true_body_yaw, true_steering);
 		   
 	//初期値を設定
@@ -105,7 +114,11 @@ int main(int argc, char** argv) {
 	
 		//制御入力を計算し、それらをルンゲクッタ法で更新
 		getInputValue.getU(x_old, sr.j);
-		getInputValue.rungeKutta(x_old, sr.j);
+		integrator.step(q_map, qdot_map, x_old[4], phidot, u1, u2);
+		getInputValue.ddrungeKutta(x_d, x_dd);
+		getInputValue.rungeKutta(x_old, x_d);
+
+		
 	
 	
 		//デバッグ用ログ出力
@@ -122,7 +135,7 @@ int main(int argc, char** argv) {
     	    x_input[4], omega_rear[0], omega_rear[1]);
 
 		// 各車両へ steering コマンドと車輪の回転速度コマンドを送信
-        vehicle1.publishSteeringCommand(x_input[4],x_input[4]);
+        vehicle1.publishSteeringCommand(x_old[4],x_old[4]);
         vehicle1.publishWheelCommand(omega_rear[0], omega_rear[1]);
 
 		// ループレートを維持

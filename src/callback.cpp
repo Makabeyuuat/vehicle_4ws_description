@@ -37,44 +37,45 @@ void jointStateCallback(const sensor_msgs::JointState::ConstPtr& msg)
         // }
 
         // …既存の revolute ジョイント処理…
-    }
+        if (msg->name[i] == "front_right_steering") {
+            phidot = msg->velocity[i];
+            break;
+            }
+        }
 }
 
 // body_link 用のコールバック
 void trueBodyLinkCallback(const nav_msgs::Odometry::ConstPtr& msg)
 {
+    // — 既存の姿勢・オイラー角取得処理 —
     body_link_pose.header = msg->header;
-    body_link_pose.pose = msg->pose.pose;
+    body_link_pose.pose   = msg->pose.pose;
     body_link_pose_received = true;
-    
-    tf2::Quaternion q;
-    q.setX(body_link_pose.pose.orientation.x);
-    q.setY(body_link_pose.pose.orientation.y);
-    q.setZ(body_link_pose.pose.orientation.z);
-    q.setW(body_link_pose.pose.orientation.w);
-    
+
+    tf2::Quaternion q(
+      body_link_pose.pose.orientation.x,
+      body_link_pose.pose.orientation.y,
+      body_link_pose.pose.orientation.z,
+      body_link_pose.pose.orientation.w);
     double roll, pitch, yaw;
     tf2::Matrix3x3(q).getRPY(roll, pitch, yaw);
 
     true_body_pos[0] = body_link_pose.pose.position.x;
     true_body_pos[1] = body_link_pose.pose.position.y;
     true_body_yaw    = yaw;
-    
-    x_old[1] = body_link_pose.pose.position.x -cos(yaw) * (lv/2);
-    x_old[2] = body_link_pose.pose.position.y -sin(yaw) * (lv/2);
+    x_old[1] = body_link_pose.pose.position.x - cos(yaw) * (lv/2);
+    x_old[2] = body_link_pose.pose.position.y - sin(yaw) * (lv/2);
     x_old[3] = yaw;
-
-    
     got_body_pose = true;
 
-    
-    
-    // ROS_INFO("True position of [body_link] (world): x=%f, y=%f, z=%f | Orientation: roll=%f, pitch=%f, yaw=%f",
-    //          body_link_pose.pose.position.x,
-    //          body_link_pose.pose.position.y,
-    //          body_link_pose.pose.position.z,
-    //          roll, pitch, yaw);
-    
+    // — u1_act の取得ロジック追加 —
+    // body frame 前方速度 vx, 横方向速度 vy を取得
+    qdot_twist[0] = msg->twist.twist.linear.x;
+    qdot_twist[1] = msg->twist.twist.linear.y;
+    qdot_twist[2] = msg->twist.twist.angular.z
+    // twist が body_frame ならそのまま vx を前進速度とする
+    // もし world_frame であれば下記のように投影
+    // u1_act = vx * cos(yaw) + vy * sin(yaw);
 }
 
 void trueV1FrontLeftSteeringCallback(const nav_msgs::Odometry::ConstPtr& msg)
