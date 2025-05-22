@@ -29,7 +29,7 @@ double f5(const std::vector<double>& x) {
     // x = [t,x,y,theta,phi, x_d,y_d,theta_d,phi_d]
     double u1_dot =  0.0;
     double theta   = x[3];
-    double theta_d = x[7];
+    double theta_d = x_d[3];
     return u1_dot * std::cos(theta)
          - u1    * std::sin(theta) * theta_d;
 }
@@ -37,7 +37,7 @@ double f5(const std::vector<double>& x) {
 double f6(const std::vector<double>& x) {
     double u1_dot =  0.0;
     double theta   = x[3];
-    double theta_d = x[7];
+    double theta_d = x_d[3];
     return u1_dot * std::sin(theta)
          + u1    * std::cos(theta) * theta_d;
 }
@@ -45,7 +45,7 @@ double f6(const std::vector<double>& x) {
 double f7(const std::vector<double>& x) {
     double u1_dot = 0.0;
     double phi     = x[4];
-    double phi_d   = x[8];
+    double phi_d   = x_d[4];
     return (u1_dot * std::tan(phi)
           + u1    * (1.0/std::cos(phi)/std::cos(phi)) * phi_d) / lv;
 }

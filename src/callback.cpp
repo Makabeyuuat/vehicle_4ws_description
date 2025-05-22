@@ -39,6 +39,7 @@ void jointStateCallback(const sensor_msgs::JointState::ConstPtr& msg)
         // …既存の revolute ジョイント処理…
         if (msg->name[i] == "front_right_steering") {
             phidot = msg->velocity[i];
+            x_d[4] = phidot;
             break;
             }
         }
@@ -72,7 +73,10 @@ void trueBodyLinkCallback(const nav_msgs::Odometry::ConstPtr& msg)
     // body frame 前方速度 vx, 横方向速度 vy を取得
     qdot_twist[0] = msg->twist.twist.linear.x;
     qdot_twist[1] = msg->twist.twist.linear.y;
-    qdot_twist[2] = msg->twist.twist.angular.z
+    qdot_twist[2] = msg->twist.twist.angular.z;
+    x_d[1] = qdot_twist[0];
+    x_d[2] = qdot_twist[1];
+    x_d[3] = qdot_twist[2];
     // twist が body_frame ならそのまま vx を前進速度とする
     // もし world_frame であれば下記のように投影
     // u1_act = vx * cos(yaw) + vy * sin(yaw);
