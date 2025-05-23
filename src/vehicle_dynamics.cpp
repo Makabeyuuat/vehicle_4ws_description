@@ -10,8 +10,9 @@
 #include "vehicle.hpp"       // Vehicle クラスの宣言
 #include "callback.hpp"     // コールバック関数の宣言
 #include "initial.hpp"		// 初期値設定のヘッダーファイル
-#include "getInputValue.hpp"
+#include "getInputValue_dynamics.hpp"
 #include "dynamics_integrator.hpp"
+#include "pidTau.hpp"
 
 using namespace std;
 
@@ -31,8 +32,8 @@ int main(int argc, char** argv) {
 	ros::Subscriber front_left_steering_sub = nh.subscribe("/vehicle_4ws/true_front_left_steering_link", 10, trueV1FrontLeftSteeringCallback);
 
 
-	PIDGains driveGains{1.0, 0.1, 0.01};  // (Kp, Ki, Kd)
-    PIDGains steerGains{0.5, 0.05, 0.005};
+	PIDGains driveGains{50.0, 100.0, 0.01};  // (Kp, Ki, Kd)
+    PIDGains steerGains{50.0, 100.0, 0.005};
     // Vehicle クラスのインスタンス生成
     Vehicle vehicle1(nh, "v1");
 	//制御入力のクラスをインスタンス化
@@ -53,15 +54,17 @@ int main(int argc, char** argv) {
 	ROS_INFO("Locking initial pose and calling initial(): x=%.3f, y=%.3f, body_yaw=%.3f ,steering=%.3f",
            true_body_pos[0], true_body_pos[1], true_body_yaw, true_steering);
 	ROS_INFO("Locking initial pose and calling initial(): xdot=%.3f, ydot=%.3f, thetadot=%.3f ,phidot=%.3f",
-           true_body_pos[0], true_body_pos[1], true_body_yaw, true_steering);
+           x_d[1], x_d[2], x_d[3], x_d[4]);
 		   
 	//初期値を設定
 	initial(t_max, h);
 
 
 	//曲率計算
-	for (int i = 1; i < Q; i++) {
-		qs[i] = qs[i - 1] + 0.00001;
+	qs[0] = 0.0;
+	double dt = 1.0 / (Q - 1);
+	for (int i = 1; i < Q; ++i) {
+    	qs[i] = i * dt;
 	}
 
 	for (int i = 0; i < Q; i++) {
@@ -98,9 +101,14 @@ int main(int argc, char** argv) {
 
 	}
 
+	
+	ROS_INFO("Bezier[0] = (%.3f, %.3f), qs[0]=%.3f, cs[0][0]=%.3f",
+         R[0][0], R[0][1], qs[0], cs[0][0]);
+
 
 	//全探索
 	searchP(x_old);
+
 
 
 	//Gazeboのフィードバックをもとに計算
@@ -114,7 +122,7 @@ int main(int argc, char** argv) {
 	
 		//制御入力を計算し、それらをルンゲクッタ法で更新
 		getInputValue.getU(x_old, sr.j);
-		integrator.step(q_map, qdot_map, x_old[4], phidot, u1, u2);
+		integrator.step(q_map, qdot_map, x_old[4], phidot, v1, v2);
 		getInputValue.ddrungeKutta(x_d, x_dd);
 		getInputValue.rungeKutta(x_old, x_d);
 
@@ -125,14 +133,23 @@ int main(int argc, char** argv) {
     	ROS_INFO_THROTTLE(1.0, "x_old = [%.3f, %.3f, %.3f, %.3f, %.3f]",
     	    x_old[0], x_old[1], x_old[2], x_old[3], x_old[4]);
 
-    	ROS_INFO_THROTTLE(1.0, "x_input = [%.3f, %.3f, %.3f, %.3f, %.3f]",
-    	    x_input[0], x_input[1], x_input[2], x_input[3], x_input[4]);
-
     	ROS_INFO_THROTTLE(1.0, "sr: j=%d, Psx=%.3f, Psy=%.3f, d=%.3f, Cs=%.3f",
     	    sr.j, sr.Psx, sr.Psy, sr.d, sr.Cs);
 
-    	ROS_INFO_THROTTLE(1.0, "cmd: steering=%.3f, omega_rear=[%.3f, %.3f]\n",
-    	    x_input[4], omega_rear[0], omega_rear[1]);
+    	ROS_INFO_THROTTLE(1.0, "cmd: steering=%.3f, omega_rear=[%.3f, %.3f]",
+    	    x_old[4], omega_rear[0], omega_rear[1]);
+		
+		ROS_INFO_THROTTLE(1.0, "q_dd: x_dd=%.3f, y_dd=%.3f, theta_dd=%.3f",
+		    x_dd[1], x_dd[2],x_dd[3]);
+		
+		ROS_INFO_THROTTLE(1.0, "q_d: x_d=%.3f, y_d=%.3f, theta_d=%.3f",
+		    x_d[1], x_d[2],x_d[3]);
+
+		ROS_INFO_THROTTLE(1.0, "Tau: tau1=%.3f, tau2=%.3f",
+		    Tau1, Tau2);
+
+		ROS_INFO_THROTTLE(1.0, "cmd: dynamic_v=%.3f, V2=%.3f\n",
+		    dynamic_v, v2);
 
 		// 各車両へ steering コマンドと車輪の回転速度コマンドを送信
         vehicle1.publishSteeringCommand(x_old[4],x_old[4]);

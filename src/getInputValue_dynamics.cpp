@@ -1,6 +1,6 @@
-#include "getInputValue.hpp"
+#include "getInputValue_dynamics.hpp"
 #include "initial.hpp"
-#include "differential_equations.hpp"
+#include "differential_equations_dynamics.hpp"
 #include "mathFunc.h"
 
 using namespace std;
@@ -13,7 +13,7 @@ getInputValue::getInputValue(double h)
     q(Dim+1, std::vector<double>(4,0.0)),
     x_stage(3,   std::vector<double>(Dim+1,0.0)),
     rearOmega{0.0, 0.0},
-    fAllVec(fAll.begin(), fAll.end())
+    fAllVec(fAll.begin(), fAll.end()),
     fdAllVec(fdAll.begin(), fdAll.end())
    
 {
@@ -59,11 +59,11 @@ void getInputValue::rungeKutta(std::vector<double>& x_old, std::vector<double>& 
     //qdを積分
     // 第1段階
         for (int i = 0; i < n; i++) {
-        double dx = x_d[i];
-        k[i][0] = h * dx;
-        r[i][0] = (k[i][0] - 2.0 * q[i][3]) / 2.0;
-        x_stage[0][i] = x_old[i] + r[i][0];
-        q[i][0] = q[i][3] + 3.0 * r[i][0] - k[i][0] / 2.0;
+            double dx = x_d[i];
+            k[i][0] = h * dx;
+            r[i][0] = (k[i][0] - 2.0 * q[i][3]) / 2.0;
+            x_stage[0][i] = x_old[i] + r[i][0];
+            q[i][0] = q[i][3] + 3.0 * r[i][0] - k[i][0] / 2.0;
         }   
         // 第2段階
         for (int i = 0; i < n; i++) {
@@ -83,16 +83,16 @@ void getInputValue::rungeKutta(std::vector<double>& x_old, std::vector<double>& 
         }
         // 第4段階
         for (int i = 0; i < n; i++) {
-            double dx = x_d[i];
+            double dx = fAllVec[i](x_stage[0]);
             k[i][3] = h * dx;
             r[i][3] = (k[i][3] - 2.0 * q[i][2]) / 6.0;
             x_new[i] = x_stage[2][i] + r[i][3];
             q[i][3] = q[i][2] + 3.0 * r[i][3] - k[i][3] / 2.0;
         }
-        // ... 更新結果を x_new に格納
-        for(int i=0;i<n; n++){
-            x_old[i] = x_new[n]
+        for(int i=1;i<n; i++){
+            x_old[i] = x_new[i];
         }
+        x_old[0] = x_old[0] + h;  // 時間の更新
 
         dynamic_v = x_d[1]*cos(x_old[3]) + x_d[2]*sin(x_old[3]);
 
@@ -105,43 +105,43 @@ void getInputValue::rungeKutta(std::vector<double>& x_old, std::vector<double>& 
 
 void getInputValue::ddrungeKutta(std::vector<double>& x_d, std::vector<double>& x_dd) {
     std::vector<double> x_newd = std::vector<double>(Dim +1, 0.0);
-    int n = static_cast<int>(x_dd.size());  // n = Dim+1
+    int n = static_cast<int>(x_dd.size()); 
     //qdを積分
     // 第1段階
         for (int i = 0; i < n; i++) {
-            double dx = x_dd[i];
-            k[i][0] = h * dx;
+            double ddx = x_dd[i];
+            k[i][0] = h * ddx;
             r[i][0] = (k[i][0] - 2.0 * q[i][3]) / 2.0;
             x_stage[0][i] = x_d[i] + r[i][0];
             q[i][0] = q[i][3] + 3.0 * r[i][0] - k[i][0] / 2.0;
         }   
         // 第2段階
         for (int i = 0; i < n; i++) {
-            double dx = fdAllVec[i](x_stage[0]);
-            k[i][1] = h * dx;
+            double ddx = fdAllVec[i](x_stage[0]);
+            k[i][1] = h * ddx;
             r[i][1] = (1.0 - sqrt(0.5)) * (k[i][1] - q[i][0]);
             x_stage[1][i] = x_stage[0][i] + r[i][1];
             q[i][1] = q[i][0] + 3.0 * r[i][1] - (1.0 - sqrt(0.5)) * k[i][1];
         }
         // 第3段階
         for (int i = 0; i < n; i++) {
-            double dx = fdAllVec[i](x_stage[0]);
-            k[i][2] = h * dx;
+            double ddx = fdAllVec[i](x_stage[0]);
+            k[i][2] = h * ddx;
             r[i][2] = (1.0 + sqrt(0.5)) * (k[i][2] - q[i][1]);
             x_stage[2][i] = x_stage[1][i] + r[i][2];
             q[i][2] = q[i][1] + 3.0 * r[i][2] - (1.0 + sqrt(0.5)) * k[i][2];
         }
         // 第4段階
         for (int i = 0; i < n; i++) {
-            double dx = x_dd[i];
-            k[i][3] = h * dx;
+            double ddx = fdAllVec[i](x_stage[0]);
+            k[i][3] = h * ddx;
             r[i][3] = (k[i][3] - 2.0 * q[i][2]) / 6.0;
-            x_newdd[i] = x_stage[2][i] + r[i][3];
+            x_newd[i] = x_stage[2][i] + r[i][3];
             q[i][3] = q[i][2] + 3.0 * r[i][3] - k[i][3] / 2.0;
         }
         // ... 更新結果を x_new に格納
-        for(int i=0;i<n; n++){
-            x_d[i] = x_newd[n]
+        for(int i=0;i<n; i++){
+            x_d[i] = x_newd[i];
         }     
 }
 

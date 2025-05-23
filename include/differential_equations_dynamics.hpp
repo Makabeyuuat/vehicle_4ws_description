@@ -22,6 +22,6 @@ double f8 (const std::vector<double>& x);
 // 関数ポインタ型エイリアス（getInputValue からも使えます）
 using FunctionPtr = double(*)(const std::vector<double>&);
 extern const std::array<FunctionPtr, /*DIM+1=*/5> fAll;
-extern const std::array<FunctionPtr, /*DIM+1=*/4> fdAll;
+extern const std::array<FunctionPtr, /*DIM+1=*/5> fdAll;
 
 #endif // DIFFERENTIAL_EQUATIONS_HPP

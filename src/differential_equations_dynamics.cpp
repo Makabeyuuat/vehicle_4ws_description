@@ -25,7 +25,11 @@ double f4 (const std::vector<double>&x) {
     return u2; 
 }
 
-double f5(const std::vector<double>& x) {
+double f5 (const std::vector<double>& x) { 
+    return 1.0; 
+}
+
+double f6(const std::vector<double>& x) {
     // x = [t,x,y,theta,phi, x_d,y_d,theta_d,phi_d]
     double u1_dot =  0.0;
     double theta   = x[3];
@@ -34,7 +38,7 @@ double f5(const std::vector<double>& x) {
          - u1    * std::sin(theta) * theta_d;
 }
 
-double f6(const std::vector<double>& x) {
+double f7(const std::vector<double>& x) {
     double u1_dot =  0.0;
     double theta   = x[3];
     double theta_d = x_d[3];
@@ -42,7 +46,7 @@ double f6(const std::vector<double>& x) {
          + u1    * std::cos(theta) * theta_d;
 }
 
-double f7(const std::vector<double>& x) {
+double f8(const std::vector<double>& x) {
     double u1_dot = 0.0;
     double phi     = x[4];
     double phi_d   = x_d[4];
@@ -50,7 +54,7 @@ double f7(const std::vector<double>& x) {
           + u1    * (1.0/std::cos(phi)/std::cos(phi)) * phi_d) / lv;
 }
 
-double f8(const std::vector<double>& x) {
+double f9(const std::vector<double>& x) {
     // phi_d の微分 = u2 の時間微分
     double u2_dot =  0.0;
     return u2_dot;
@@ -60,6 +64,6 @@ double f8(const std::vector<double>& x) {
 const std::array<FunctionPtr, 5> fAll = {{
   f0, f1, f2, f3, f4
 }};
-const std::array<FunctionPtr, 4> fdAll = {{
-  f5, f6, f7, f8
+const std::array<FunctionPtr, 5> fdAll = {{
+  f5, f6, f7, f8, f9
 }};

@@ -67,6 +67,9 @@ void trueBodyLinkCallback(const nav_msgs::Odometry::ConstPtr& msg)
     x_old[1] = body_link_pose.pose.position.x - cos(yaw) * (lv/2);
     x_old[2] = body_link_pose.pose.position.y - sin(yaw) * (lv/2);
     x_old[3] = yaw;
+    q_twist[0] = body_link_pose.pose.position.x - cos(yaw) * (lv/2);
+    q_twist[1] = body_link_pose.pose.position.y - sin(yaw) * (lv/2);
+    q_twist[2] = yaw;  
     got_body_pose = true;
 
     // — u1_act の取得ロジック追加 —

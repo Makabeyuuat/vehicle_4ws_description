@@ -8,6 +8,7 @@ add_compile_options(-std=c++11)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_BUILD_TYPE Debug CACHE STRING "Build type")
 
 ## catkinのマクロとライブラリを検索
 find_package(catkin REQUIRED COMPONENTS
@@ -27,6 +28,7 @@ include_directories(
   include
   ${catkin_INCLUDE_DIRS}
 )
+
 
 ## 実行ファイルの定義
 add_executable(test_motion_controller
@@ -55,6 +57,23 @@ target_link_libraries(Xaxis_tracking_controller
 
 install(TARGETS Xaxis_tracking_controller
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+
+## 実行ファイルの定義
+add_executable(vehicle_dynamics_controller
+  src/vehicle_dynamics.cpp
+  src/vehicle.cpp
+  src/callback.cpp
+  src/Bezier.cpp
+  src/differential_equations_dynamics.cpp
+  src/initial.cpp
+  src/mathFunc.cpp
+  src/getInputValue_dynamics.cpp
+  src/dynamics_integrator.cpp
+)
+target_link_libraries(vehicle_dynamics_controller
+  ${catkin_LIBRARIES}
 )
 
 

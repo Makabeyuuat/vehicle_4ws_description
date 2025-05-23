@@ -21,11 +21,11 @@
 <xacro:property name="front_steering_friction" value="${front_steering_mu * gravitational_acceleration * 0.25*vehicle_body_mass}" />
 
 <!-- rearは駆動輪なので、入力以外で動かないように設定 -->
-<xacro:property name="wheel_joint_damping" value="5.0"/>
-<xacro:property name="wheel_joint_mu" value="0.1" />
+<xacro:property name="wheel_joint_damping" value="0.2"/>
+<xacro:property name="wheel_joint_mu" value="0.05" />
 <xacro:property name="wheel_joint_friction" value="${wheel_joint_mu* gravitational_acceleration * wheel_mass }" /> 
 <xacro:property name="steering_damping" value="20.0" />
-<xacro:property name="steering_mu" value="0.5" />
+<xacro:property name="steering_mu" value="0.01" />
 <xacro:property name="steering_friction" value="${steering_mu * gravitational_acceleration * 0.25*vehicle_body_mass}" />
 
 <!-- rotationは共通 -->
