@@ -97,35 +97,9 @@ void DynamicsIntegrator::step(const Eigen::Vector3d& q,
     b(3) = -xdot*(thetadot+phidot)*cos(theta+phi) - ydot*(thetadot+phidot)*sin(theta+phi)-lv_*thetadot*phidot*sin(phi);
     b(4) = -xdot*thetadot*cos(theta) + ydot*thetadot*sin(theta);
 
-    // Hの疑似逆行列を計算 
-    Eigen::FullPivLU<Eigen::Matrix<double,5,5>> lu(H);
-    Eigen::Matrix<double,5,1> sol;
-    if (lu.isInvertible()) {
-        //通常の solve() で解く
-        sol = lu.solve(b);
-    }
-    else {
-        // 特異 ⇒ SVD による擬似逆行列で最小ノルム解を得る
-        Eigen::JacobiSVD<Eigen::Matrix<double,5,5>> svd(
-            H, Eigen::ComputeThinU | Eigen::ComputeThinV);
-        // 特異値ベクトル
-        const auto& S = svd.singularValues();
-        // トレランスの設定（最大特異値 × 次元 × 機械精度 の目安）
-        double tol = S(0) * std::max(H.rows(), H.cols()) * std::numeric_limits<double>::epsilon();
-        // 擬似逆行列を構築
-        Eigen::VectorXd Sinv(5);
-        Sinv.setZero(); 
-        for (int i = 0; i < S.size(); ++i) {
-            if (S(i) > tol) {
-                Sinv(i) = 1.0 / S(i);
-            }
-            // tol 以下の特異値は 0 にして、ノイズを切り捨て
-        }
-        // H⁺ = V · S⁺ · Uᵀ
-        Eigen::Matrix<double,5,5> H_pinv =svd.matrixV() * Sinv.asDiagonal() * svd.matrixU().transpose();
-        // 最小ノルム解
-        sol = H_pinv * b;
-    }
+    // Hの疑似逆行列を計算
+    Eigen::MatrixXd Hxi_pinv = (H.transpose() * H).inverse()* H.transpose();
+    Eigen::VectorXd sol= Hxi_pinv * b;
     
     Eigen::Vector3d qdd = sol.block<3,1>(0,0);
     Eigen::Vector2d lambda = sol.block<2,1>(3,0); 
