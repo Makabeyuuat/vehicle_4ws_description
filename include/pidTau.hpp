@@ -1,53 +1,55 @@
 #pragma once
-#include <algorithm>
-#include <Eigen/Dense>
 
 /**
- * @brief PIDTorque: 速度差分に対するPID制御器（アンチワインドアップ＋微分制限付き）
+ * @brief PIDTorque: PDF 式 (5.11)–(5.14) に忠実な PID 制御器
  */
 struct PIDGains {
-    double Kp;  // 比例ゲイン
-    double Ki;  // 積分ゲイン
-    double Kd;  // 微分ゲイン
-    double i_max; // 積分飽和上限
-    double d_max; // 微分飽和上限
+    double Kp;   ///< 比例ゲイン
+    double Ki;   ///< 積分ゲイン
+    double Kd;   ///< 微分ゲイン
 };
 
 class PIDTorque {
 public:
     PIDTorque(const PIDGains& gains, double dt)
-      : gains_(gains), dt_(dt), prev_error_(0.0), integral_(0.0)
+      : gains_(gains)
+      , dt_(dt)
+      , prev_error_(0.0)
+      , integral_(0.0)
+      , first_step_(true)
     {}
 
-    /**
-     * @param u     目標入力（u1 または u2）
-     * @param u_act 実効入力（u1_act または phi_dot）
-     * @return      出力トルク τ
-     */
     double compute(double u, double u_act) {
-        // 1) 誤差
-        double error = u - u_act;
+        //誤差
+        double e = u - u_act;
 
-        // 2) 積分項 (アンチワインドアップ)
-        integral_ += error * dt_;
-        integral_ = std::clamp(integral_, -gains_.i_max, gains_.i_max);
+        // 2) 積分 (Eq.5.13)
+        if (first_step_) {
+            integral_ = gains_.Ki * e;  
+        } else {
+            integral_ += gains_.Ki * e * dt_;
+        }
 
-        // 3) 微分項 (ノイズ抑制)
-        double raw_deriv = (error - prev_error_) / dt_;
-        double derivative = std::clamp(raw_deriv, -gains_.d_max, gains_.d_max);
+        // 3) 微分 (Eq.5.14)
+        double derivative;
+        if (first_step_) {
+            derivative  = gains_.Kd * e;
+            first_step_ = false;
+        } else {
+            derivative  = gains_.Kd * (e - prev_error_) / dt_;
+        }
+        prev_error_ = e;
 
-        // 4) 更新
-        prev_error_ = error;
-
-        // 5) PID 合成
-        return gains_.Kp * error
-             + gains_.Ki * integral_
-             + gains_.Kd * derivative;
+        // 4) 合成 (Eq.5.11/5.12)
+        return gains_.Kp * e
+             + integral_
+             + derivative;
     }
 
 private:
     PIDGains gains_;
-    double dt_;
-    double prev_error_;
-    double integral_;
+    double   dt_;
+    double   prev_error_;
+    double   integral_;
+    bool     first_step_;
 };

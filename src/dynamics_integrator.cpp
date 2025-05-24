@@ -40,44 +40,43 @@ void DynamicsIntegrator::step(const Eigen::Vector3d& q,
     double ydot     = qdot(1);
     double thetadot = qdot(2);
 
-    // 1) PID制御でτを計算 (式5.11・5.12)
+    //PID制御でtauを計算
     double u1_act = xdot * cos(theta) + ydot * sin(theta);
     double tau1   = drive_pid_.compute(v1, u1_act);
     Tau1 = tau1;
     double tau2   = steer_pid_.compute(v2, phidot);
     Tau2 = tau2;
-    // 2) 一般化駆動力 Qc, Qphi の構築 (式5.15)
+    //駆動力
     Eigen::Vector3d Qc;
     Qc << tau1 * std::cos(theta),
           tau1 * std::sin(theta),
           0.0;
     double Qphi = tau2;
 
-    // 3) Chapter5 行列の定義 (仮実装: 後から計算式を入れる)
-    // 質量行列 Mξ (3x3)
+    //各行列を定義
+    // 質量行列(3x3)
     Eigen::Matrix3d Mxi;
-    // TODO: 資料式5.18に基づき要素を設定
     Mxi <<  M_mass_, 0.0, -(lv_ *M_mass_ * sin(theta))/2.0,
             0.0, M_mass_, (lv_ *M_mass_ * cos(theta))/2.0,
             -(lv_ *M_mass_ * sin(theta))/2.0, (lv_ *M_mass_ * cos(theta))/2.0, (2*I_theta_ + M_mass_*((pow(lv_,2)*pow(cos(theta),2))/2.0 + (pow(lv_,2)*pow(sin(theta),2))/2.0))/2.0;
 
-    // コリオリ行列 Cξ (3x3)
+    // コリオリ行列(3x3)
     Eigen::Matrix3d Cxi;
     Cxi <<  0.0, 0.0, -(lv_*M_mass_*cos(theta)*thetadot),
             0.0, 0.0, -(lv_*M_mass_*sin(theta)*thetadot),
             0.0, 0.0, 0.0;
 
-    // 重力ベクトル Kξ (3x1)
+    // 重力ベクトル(3x1)
     Eigen::Vector3d Kxi;
     Kxi << GRAV*M_mass_*sin(rho_), 0.0, -(GRAV*lv_*M_mass_*sin(rho_)*sin(theta))/2.0;
 
-    // 拘束行列 Aξ (3x2)
+    // 拘束行列(3x2)
     Eigen::Matrix<double,3,2> Axi;
     Axi <<  sin(theta + phi), sin(theta),
             -cos(theta + phi), -cos(theta),
             -lv_ * cos(phi), 0.0;
 
-    // ヤコビ行列 J (2x3)
+    // ヤコビ行列(2x3)
     Eigen::Matrix<double,2,3> J;
     J <<  sin(theta + phi), -cos(theta + phi), -lv_ * cos(phi),
             sin(theta), -cos(theta), 0.0;
