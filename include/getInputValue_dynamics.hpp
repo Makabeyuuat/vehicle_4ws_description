@@ -35,8 +35,9 @@ private:
     std::vector<std::vector<double>> k; // k[][0..3]
     std::vector<std::vector<double>> r; // r[][0..3]
     std::vector<std::vector<double>> q; // q[][0..3]
-    std::vector<std::vector<double>> x_stage; // x[0], x[1], x[2]
-    std::array<double,2> rearOmega;  
+    std::vector<std::vector<double>> x; // x[0], x[1], x[2]
+    std::array<double,2> rearOmega; 
+    std::array<double,2> rearTorque;  
 
     // differential_equations.hpp で定義された配列をコピー
     std::vector<FunctionPtr> fAllVec;
@@ -47,6 +48,7 @@ private:
     // 後輪左右の角速度を計算
     // @return std::array{omega_left, omega_right}
     std::array<double,2> computeRearWheelOmegas(double speed, double steeringAngle);
+    std::array<double,2> computeRearWheelTorque(double Fx, double steeringAngle);
 
     void V1(const std::vector<double>& x_old, int sr_j);
     void V2(const std::vector<double>& x_old, int sr_j);

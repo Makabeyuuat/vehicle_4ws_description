@@ -51,7 +51,7 @@ double f8(const std::vector<double>& x) {
     double phi     = x[4];
     double phi_d   = x_d[4];
     return (u1_dot * std::tan(phi)
-          + u1    * (1.0/std::cos(phi)/std::cos(phi)) * phi_d) / lv;
+          + u1    * (phi_d/(std::cos(phi)*std::cos(phi)))) / lv;
 }
 
 double f9(const std::vector<double>& x) {

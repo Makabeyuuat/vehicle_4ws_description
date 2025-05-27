@@ -1,8 +1,5 @@
 #pragma once
 
-/**
- * @brief PIDTorque: PDF 式 (5.11)–(5.14) に忠実な PID 制御器
- */
 struct PIDGains {
     double Kp;   ///< 比例ゲイン
     double Ki;   ///< 積分ゲイン
@@ -23,14 +20,14 @@ public:
         //誤差
         double e = u - u_act;
 
-        // 2) 積分 (Eq.5.13)
+        //積分 
         if (first_step_) {
             integral_ = gains_.Ki * e;  
         } else {
             integral_ += gains_.Ki * e * dt_;
         }
 
-        // 3) 微分 (Eq.5.14)
+        //微分
         double derivative;
         if (first_step_) {
             derivative  = gains_.Kd * e;
@@ -40,7 +37,6 @@ public:
         }
         prev_error_ = e;
 
-        // 4) 合成 (Eq.5.11/5.12)
         return gains_.Kp * e
              + integral_
              + derivative;

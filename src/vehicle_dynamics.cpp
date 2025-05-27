@@ -32,8 +32,8 @@ int main(int argc, char** argv) {
 	ros::Subscriber front_left_steering_sub = nh.subscribe("/vehicle_4ws/true_front_left_steering_link", 10, trueV1FrontLeftSteeringCallback);
 
 
-	PIDGains driveGains{50.0, 100.0, 0.01};  // (Kp, Ki, Kd)
-    PIDGains steerGains{50.0, 100.0, 0.005};
+	PIDGains driveGains{400.0, 40.0, 0.01};  // (Kp, Ki, Kd)
+    PIDGains steerGains{2.0, 0.2, 0.005};
     // Vehicle クラスのインスタンス生成
     Vehicle vehicle1(nh, "v1");
 	//制御入力のクラスをインスタンス化
@@ -108,6 +108,12 @@ int main(int argc, char** argv) {
 
 	//全探索
 	searchP(x_old);
+	// // 各車両へ steering コマンドと車輪の回転速度コマンドを送信
+    // vehicle1.publishSteeringCommand(x_old[4],x_old[4]);
+    // vehicle1.publishWheelCommand(v1, v1);
+	// 各車両へ steering コマンドと車輪のトルクコマンドを送信
+    vehicle1.publishSteeringCommand(x_old[4],x_old[4]);
+    vehicle1.publishWheelCommand(torque_rear[0], torque_rear[1]);
 
 
 
@@ -139,10 +145,10 @@ int main(int argc, char** argv) {
     	ROS_INFO_THROTTLE(1.0, "cmd: steering=%.3f, omega_rear=[%.3f, %.3f]",
     	    x_old[4], omega_rear[0], omega_rear[1]);
 		
-		ROS_INFO_THROTTLE(1.0, "q_dd: x_dd=%.3f, y_dd=%.3f, theta_dd=%.3f",
+		ROS_INFO_THROTTLE(1.0, "x_dd: x_dd=%.3f, y_dd=%.3f, theta_dd=%.3f",
 		    x_dd[1], x_dd[2],x_dd[3]);
 		
-		ROS_INFO_THROTTLE(1.0, "q_d: x_d=%.3f, y_d=%.3f, theta_d=%.3f",
+		ROS_INFO_THROTTLE(1.0, "x_d: x_d=%.3f, y_d=%.3f, theta_d=%.3f",
 		    x_d[1], x_d[2],x_d[3]);
 
 		ROS_INFO_THROTTLE(1.0, "Tau: tau1=%.3f, tau2=%.3f",
@@ -151,9 +157,12 @@ int main(int argc, char** argv) {
 		ROS_INFO_THROTTLE(1.0, "cmd: dynamic_v=%.3f, V2=%.3f\n",
 		    dynamic_v, v2);
 
-		// 各車両へ steering コマンドと車輪の回転速度コマンドを送信
-        vehicle1.publishSteeringCommand(x_old[4],x_old[4]);
-        vehicle1.publishWheelCommand(omega_rear[0], omega_rear[1]);
+		// // 各車両へ steering コマンドと車輪の回転速度コマンドを送信
+        // vehicle1.publishSteeringCommand(x_old[4],x_old[4]);
+        // vehicle1.publishWheelCommand(omega_rear[0], omega_rear[1]);
+		// 各車両へ steering コマンドと車輪のトルクコマンドを送信
+		vehicle1.publishSteeringCommand(x_old[4],x_old[4]);
+		vehicle1.publishWheelCommand(torque_rear[0], torque_rear[1]);
 
 		// ループレートを維持
 		loop_rate.sleep();
