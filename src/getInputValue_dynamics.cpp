@@ -22,9 +22,9 @@ getInputValue::getInputValue(double h)
 }
 
 array<double,2> getInputValue::computeRearWheelOmegas(double speed, double steeringAngle) {
-    const double wheelRadius = 0.3;  // ホイール半径[m]
+    const double wheelRadius = 0.15;  // ホイール半径[m]
     const double L = lv;            // ホイールベース[m]
-    const double W = 0.2;            // トレッド幅[m]
+    const double W = 0.04;            // トレッド幅[m]
     array<double,2> omegas;
 
     if (fabs(steeringAngle) < 1e-6) {
@@ -55,9 +55,9 @@ array<double,2> getInputValue::computeRearWheelOmegas(double speed, double steer
 }
 
 array<double,2> getInputValue::computeRearWheelTorque(double Fx, double steeringAngle) {
-    const double wheelRadius = 0.3;  // ホイール半径 [m]
+    const double wheelRadius = 0.15;  // ホイール半径 [m]
     const double L           = lv;   // ホイールベース [m]
-    const double W           = 0.2;  // トレッド幅 [m]
+    const double W           = 0.04;  // トレッド幅 [m]
     array<double,2> torques;
 
     // ① 前進力 → ホイールトルクに変換（２輪で均等分担）

@@ -28,6 +28,14 @@
 <xacro:property name="steering_mu" value="0.01" />
 <xacro:property name="steering_friction" value="${steering_mu * gravitational_acceleration * 0.25*vehicle_body_mass}" />
 
+<!-- wheelの接地面の摩擦などを定義 -->
+<xacro:property name="wheel_surface_mu1" value="5.0"/>
+<xacro:property name="wheel_surface_mu2" value="5.0" />
+<xacro:property name="wheel_kp" value="1e5" /> 
+<xacro:property name="wheel_kd" value="1.0" />
+<xacro:property name="wheel_minDepth" value="0.01" />
+<xacro:property name="wheel_maxVel" value="0.1" />
+
 <!-- rotationは共通 -->
 <xacro:property name="rotational_joint_damping" value="0.01" />
 <xacro:property name="rotational_joint_mu" value="0.001" />
@@ -123,48 +131,6 @@
   </collision>
 </link>
 
-<link name="new_wheel_1">
-  <inertial>
-    <origin xyz="3.1709373395083507e-05 2.540692010666312e-07 0.00021681028363659816" rpy="0 0 0"/>
-    <mass value="4.639715839283939"/>
-    <inertia ixx="0.029034" iyy="0.053334" izz="0.029034" ixy="-0.0" iyz="0.0" ixz="0.0"/>
-  </inertial>
-  <visual>
-    <origin xyz="-0.450031 0.34248 -0.150215" rpy="0 0 0"/>
-    <geometry>
-      <mesh filename="package://vehicle_4ws_description/meshes/new_wheel_1.stl" scale="0.001 0.001 0.001"/>
-    </geometry>
-    <material name="_"/>
-  </visual>
-  <collision>
-    <origin xyz="-0.450031 0.34248 -0.150215" rpy="0 0 0"/>
-    <geometry>
-      <mesh filename="package://vehicle_4ws_description/meshes/new_wheel_1.stl" scale="0.001 0.001 0.001"/>
-    </geometry>
-  </collision>
-</link>
-
-<link name="new_wheel_2">
-  <inertial>
-    <origin xyz="3.1709373397914575e-05 2.5406927345317243e-07 0.00021681028363673693" rpy="0 0 0"/>
-    <mass value="4.639715839283939"/>
-    <inertia ixx="0.029034" iyy="0.053334" izz="0.029034" ixy="0.0" iyz="0.0" ixz="0.0"/>
-  </inertial>
-  <visual>
-    <origin xyz="0.449969 0.34248 -0.150215" rpy="0 0 0"/>
-    <geometry>
-      <mesh filename="package://vehicle_4ws_description/meshes/new_wheel_2.stl" scale="0.001 0.001 0.001"/>
-    </geometry>
-    <material name="_"/>
-  </visual>
-  <collision>
-    <origin xyz="0.449969 0.34248 -0.150215" rpy="0 0 0"/>
-    <geometry>
-      <mesh filename="package://vehicle_4ws_description/meshes/new_wheel_2.stl" scale="0.001 0.001 0.001"/>
-    </geometry>
-  </collision>
-</link>
-
 <link name="new_hinge_3">
   <inertial>
     <origin xyz="-6.714468377522209e-05 2.5406917258941064e-07 -0.11523004751915977" rpy="0 0 0"/>
@@ -182,48 +148,6 @@
     <origin xyz="-0.45045 -0.45752 -0.356" rpy="0 0 0"/>
     <geometry>
       <mesh filename="package://vehicle_4ws_description/meshes/new_hinge_3.stl" scale="0.001 0.001 0.001"/>
-    </geometry>
-  </collision>
-</link>
-
-<link name="new_wheel_3">
-  <inertial>
-    <origin xyz="3.1709373395083507e-05 2.540692015662316e-07 0.00021681028363579324" rpy="0 0 0"/>
-    <mass value="4.639715839283939"/>
-    <inertia ixx="0.029034" iyy="0.053334" izz="0.029034" ixy="0.0" iyz="0.0" ixz="0.0"/>
-  </inertial>
-  <visual>
-    <origin xyz="-0.450031 -0.45752 -0.150215" rpy="0 0 0"/>
-    <geometry>
-      <mesh filename="package://vehicle_4ws_description/meshes/new_wheel_3.stl" scale="0.001 0.001 0.001"/>
-    </geometry>
-    <material name="_"/>
-  </visual>
-  <collision>
-    <origin xyz="-0.450031 -0.45752 -0.150215" rpy="0 0 0"/>
-    <geometry>
-      <mesh filename="package://vehicle_4ws_description/meshes/new_wheel_3.stl" scale="0.001 0.001 0.001"/>
-    </geometry>
-  </collision>
-</link>
-
-<link name="new_wheel_4">
-  <inertial>
-    <origin xyz="3.170937339708191e-05 2.540692737307282e-07 0.00021681028363593202" rpy="0 0 0"/>
-    <mass value="4.639715839283939"/>
-    <inertia ixx="0.029034" iyy="0.053334" izz="0.029034" ixy="0.0" iyz="0.0" ixz="0.0"/>
-  </inertial>
-  <visual>
-    <origin xyz="0.449969 -0.45752 -0.150215" rpy="0 0 0"/>
-    <geometry>
-      <mesh filename="package://vehicle_4ws_description/meshes/new_wheel_4.stl" scale="0.001 0.001 0.001"/>
-    </geometry>
-    <material name="_"/>
-  </visual>
-  <collision>
-    <origin xyz="0.449969 -0.45752 -0.150215" rpy="0 0 0"/>
-    <geometry>
-      <mesh filename="package://vehicle_4ws_description/meshes/new_wheel_4.stl" scale="0.001 0.001 0.001"/>
     </geometry>
   </collision>
 </link>
@@ -269,6 +193,167 @@
     </geometry>
   </collision>
 </link>
+
+<!-- ホイールのリンク設定 -->
+<link name="new_wheel_1">
+  <inertial>
+    <origin xyz="3.1709373395083507e-05 2.540692010666312e-07 0.00021681028363659816" rpy="0 0 0"/>
+    <mass value="4.639715839283939"/>
+    <inertia ixx="0.029034" iyy="0.053334" izz="0.029034" ixy="-0.0" iyz="0.0" ixz="0.0"/>
+  </inertial>
+  <visual>
+    <origin xyz="-0.450031 0.34248 -0.150215" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://vehicle_4ws_description/meshes/new_wheel_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="_"/>
+  </visual>
+  <collision>
+    <origin xyz="-0.450031 0.34248 -0.150215" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://vehicle_4ws_description/meshes/new_wheel_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+
+    <!-- ここから SDF の surface/friction -->
+    <surface>
+      <friction>
+        <ode>
+          <mu>${wheel_surface_mu1}</mu>
+          <mu2>${wheel_surface_mu2}</mu2>
+        </ode>
+      </friction>
+      <contact>
+        <ode>
+          <kp>${wheel_kp}</kp>
+          <kd>${wheel_kd}</kd>
+          <minDepth>${wheel_minDepth}</minDepth>
+          <maxVel>${wheel_maxVel}</maxVel>
+        </ode>
+      </contact>
+    </surface>
+  </collision>
+</link>
+
+<link name="new_wheel_2">
+  <inertial>
+    <origin xyz="3.1709373397914575e-05 2.5406927345317243e-07 0.00021681028363673693" rpy="0 0 0"/>
+    <mass value="4.639715839283939"/>
+    <inertia ixx="0.029034" iyy="0.053334" izz="0.029034" ixy="0.0" iyz="0.0" ixz="0.0"/>
+  </inertial>
+  <visual>
+    <origin xyz="0.449969 0.34248 -0.150215" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://vehicle_4ws_description/meshes/new_wheel_2.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="_"/>
+  </visual>
+  <collision>
+    <origin xyz="0.449969 0.34248 -0.150215" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://vehicle_4ws_description/meshes/new_wheel_2.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+
+    <!-- ここから SDF の surface/friction -->
+    <surface>
+      <friction>
+        <ode>
+          <mu>${wheel_surface_mu1}</mu>
+          <mu2>${wheel_surface_mu2}</mu2>
+        </ode>
+      </friction>
+      <contact>
+        <ode>
+          <kp>${wheel_kp}</kp>
+          <kd>${wheel_kd}</kd>
+          <minDepth>${wheel_minDepth}</minDepth>
+          <maxVel>${wheel_maxVel}</maxVel>
+        </ode>
+      </contact>
+    </surface>
+  </collision>
+</link>
+
+
+
+<link name="new_wheel_3">
+  <inertial>
+    <origin xyz="3.1709373395083507e-05 2.540692015662316e-07 0.00021681028363579324" rpy="0 0 0"/>
+    <mass value="4.639715839283939"/>
+    <inertia ixx="0.029034" iyy="0.053334" izz="0.029034" ixy="0.0" iyz="0.0" ixz="0.0"/>
+  </inertial>
+  <visual>
+    <origin xyz="-0.450031 -0.45752 -0.150215" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://vehicle_4ws_description/meshes/new_wheel_3.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="_"/>
+  </visual>
+  <collision>
+    <origin xyz="-0.450031 -0.45752 -0.150215" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://vehicle_4ws_description/meshes/new_wheel_3.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+
+    <!-- ここから SDF の surface/friction -->
+    <surface>
+      <friction>
+        <ode>
+          <mu>${wheel_surface_mu1}</mu>
+          <mu2>${wheel_surface_mu2}</mu2>
+        </ode>
+      </friction>
+      <contact>
+        <ode>
+          <kp>${wheel_kp}</kp>
+          <kd>${wheel_kd}</kd>
+          <minDepth>${wheel_minDepth}</minDepth>
+          <maxVel>${wheel_maxVel}</maxVel>
+        </ode>
+      </contact>
+    </surface>
+  </collision>
+</link>
+
+<link name="new_wheel_4">
+  <inertial>
+    <origin xyz="3.170937339708191e-05 2.540692737307282e-07 0.00021681028363593202" rpy="0 0 0"/>
+    <mass value="4.639715839283939"/>
+    <inertia ixx="0.029034" iyy="0.053334" izz="0.029034" ixy="0.0" iyz="0.0" ixz="0.0"/>
+  </inertial>
+  <visual>
+    <origin xyz="0.449969 -0.45752 -0.150215" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://vehicle_4ws_description/meshes/new_wheel_4.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+    <material name="_"/>
+  </visual>
+  <collision>
+    <origin xyz="0.449969 -0.45752 -0.150215" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="package://vehicle_4ws_description/meshes/new_wheel_4.stl" scale="0.001 0.001 0.001"/>
+    </geometry>
+
+    <!-- ここから SDF の surface/friction -->
+    <surface>
+      <friction>
+        <ode>
+          <mu>${wheel_surface_mu1}</mu>
+          <mu2>${wheel_surface_mu2}</mu2>
+        </ode>
+      </friction>
+      <contact>
+        <ode>
+          <kp>${wheel_kp}</kp>
+          <kd>${wheel_kd}</kd>
+          <minDepth>${wheel_minDepth}</minDepth>
+          <maxVel>${wheel_maxVel}</maxVel>
+        </ode>
+      </contact>
+    </surface>
+  </collision>
+</link>
+
+
 
 <joint name="body" type="fixed">
   <origin xyz="0 0 0.376" rpy="0 0 0"/>

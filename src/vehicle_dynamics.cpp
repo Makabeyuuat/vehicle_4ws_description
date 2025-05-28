@@ -142,8 +142,8 @@ int main(int argc, char** argv) {
     	ROS_INFO_THROTTLE(1.0, "sr: j=%d, Psx=%.3f, Psy=%.3f, d=%.3f, Cs=%.3f",
     	    sr.j, sr.Psx, sr.Psy, sr.d, sr.Cs);
 
-    	ROS_INFO_THROTTLE(1.0, "cmd: steering=%.3f, omega_rear=[%.3f, %.3f]",
-    	    x_old[4], omega_rear[0], omega_rear[1]);
+    	// ROS_INFO_THROTTLE(1.0, "cmd: steering=%.3f, omega_rear=[%.3f, %.3f]",
+    	//     x_old[4], omega_rear[0], omega_rear[1]);
 		
 		ROS_INFO_THROTTLE(1.0, "x_dd: x_dd=%.3f, y_dd=%.3f, theta_dd=%.3f",
 		    x_dd[1], x_dd[2],x_dd[3]);
@@ -154,8 +154,8 @@ int main(int argc, char** argv) {
 		ROS_INFO_THROTTLE(1.0, "Tau: tau1=%.3f, tau2=%.3f",
 		    Tau1, Tau2);
 
-		ROS_INFO_THROTTLE(1.0, "cmd: dynamic_v=%.3f, V2=%.3f\n",
-		    dynamic_v, v2);
+		ROS_INFO_THROTTLE(1.0, "Torque: rear_left=%.3f, rear_right=%.3f\n",
+		    torque_rear[0], torque_rear[1]);
 
 		// // 各車両へ steering コマンドと車輪の回転速度コマンドを送信
         // vehicle1.publishSteeringCommand(x_old[4],x_old[4]);
