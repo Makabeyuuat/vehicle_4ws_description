@@ -209,9 +209,14 @@
     <material name="_"/>
   </visual>
   <collision>
-    <origin xyz="-0.450031 0.34248 -0.150215" rpy="0 0 0"/>
-    <geometry>
+    
+    <!-- <origin xyz="-0.450031 0.34248 -0.150215" rpy="0 0 0"/> -->
+    <!-- <geometry>
       <mesh filename="package://vehicle_4ws_description/meshes/new_wheel_1.stl" scale="0.001 0.001 0.001"/>
+    </geometry> -->
+    <origin xyz="0 0 0" rpy="1.57 0 0"/>
+    <geometry>
+      <cylinder radius="0.16" length="0.05"/>
     </geometry>
 
     <!-- ここから SDF の surface/friction -->
@@ -248,9 +253,13 @@
     <material name="_"/>
   </visual>
   <collision>
-    <origin xyz="0.449969 0.34248 -0.150215" rpy="0 0 0"/>
+    <!-- <origin xyz="0.449969 0.34248 -0.150215" rpy="0 0 0"/>
     <geometry>
       <mesh filename="package://vehicle_4ws_description/meshes/new_wheel_2.stl" scale="0.001 0.001 0.001"/>
+    </geometry> -->
+    <origin xyz="0 0 0" rpy="1.57 0 0"/>
+    <geometry>
+      <cylinder radius="0.16" length="0.05"/>
     </geometry>
 
     <!-- ここから SDF の surface/friction -->
@@ -289,9 +298,13 @@
     <material name="_"/>
   </visual>
   <collision>
-    <origin xyz="-0.450031 -0.45752 -0.150215" rpy="0 0 0"/>
+    <!-- <origin xyz="-0.450031 -0.45752 -0.150215" rpy="0 0 0"/>
     <geometry>
       <mesh filename="package://vehicle_4ws_description/meshes/new_wheel_3.stl" scale="0.001 0.001 0.001"/>
+    </geometry> -->
+    <origin xyz="0 0 0" rpy="1.57 0 0"/>
+    <geometry>
+      <cylinder radius="0.16" length="0.05"/>
     </geometry>
 
     <!-- ここから SDF の surface/friction -->
@@ -328,9 +341,13 @@
     <material name="_"/>
   </visual>
   <collision>
-    <origin xyz="0.449969 -0.45752 -0.150215" rpy="0 0 0"/>
+    <!-- <origin xyz="0.449969 -0.45752 -0.150215" rpy="0 0 0"/>
     <geometry>
       <mesh filename="package://vehicle_4ws_description/meshes/new_wheel_4.stl" scale="0.001 0.001 0.001"/>
+    </geometry> -->
+    <origin xyz="0 0 0" rpy="1.57 0 0"/>
+    <geometry>
+      <cylinder radius="0.16" length="0.05"/>
     </geometry>
 
     <!-- ここから SDF の surface/friction -->

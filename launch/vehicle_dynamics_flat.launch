@@ -4,7 +4,7 @@
   <param name="robot_description" command="$(find xacro)/xacro '$(find vehicle_4ws_description)/urdf/vehicle_4ws_real.xacro'" />
 
   <!-- Gazebo にスポーン -->
-  <node pkg="gazebo_ros" type="spawn_model" name="spawn_urdf" args="-param robot_description -urdf -model vehicle_4ws -x -6.0 -y -1.1 -z 0.0 -R 0.0 -P -0.0 -Y 0.0" />
+  <node pkg="gazebo_ros" type="spawn_model" name="spawn_urdf" args="-param robot_description -urdf -model vehicle_4ws -x -6.0 -y -1.01 -z 0.0 -R 0.0 -P -0.0 -Y 0.0" />
 
   <!-- RViz の設定 -->
   <arg name="rvizconfig" default="$(find vehicle_4ws_description)/rviz/urdf.rviz"/>
