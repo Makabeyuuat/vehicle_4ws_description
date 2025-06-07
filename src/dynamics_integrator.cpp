@@ -42,9 +42,9 @@ void DynamicsIntegrator::step(const Eigen::Vector3d& q,
 
     //PID制御でtauを計算
     double u1_act = xdot * cos(theta) + ydot * sin(theta);
-    double tau1   = drive_pid_.compute(v1, u1_act);
+    double tau1   = drive_pid_.compute(u1, u1_act);
     Tau1 = tau1;
-    double tau2   = steer_pid_.compute(v2, phidot);
+    double tau2   = steer_pid_.compute(u2, phidot);
     Tau2 = tau2;
     //駆動力
     Eigen::Vector3d Qc;

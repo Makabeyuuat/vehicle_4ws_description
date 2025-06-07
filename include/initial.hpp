@@ -72,6 +72,7 @@ inline double	h, t_max;
 //input
 //制御入力
 inline double  w1;
+inline double  w2;
 //inline double a0 = 0.2;
 inline double u1, u2;
 inline double v1, v2;

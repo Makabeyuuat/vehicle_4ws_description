@@ -200,8 +200,8 @@ void getInputValue::getU(std::vector<double>& x_old, int sr_j) {
 
     x_old[4] = x_old[4] - thetaT;
 
-    V1(x_old, sr_j);
-    V2(x_old, sr_j);
+    U1(x_old, sr_j);
+    U2(x_old, sr_j);
 
 
 }
@@ -221,16 +221,16 @@ void getInputValue::getXInput(std::vector<double>& x_old, std::vector<double>& x
 // double getInputValue::getU12() const { return u12; }
 
 // --- 制御入力計算用内部関数 ---
-void getInputValue::V1(const std::vector<double>& x_old, int sr_j) {
+void getInputValue::U1(const std::vector<double>& x_old, int sr_j) {
 
 
-	v1 = ((1 - sr.d * sr.Cs) / cos(thetaT - atan2(dRdq[sr_j][1], dRdq[sr_j][0]))) * u1;
+	u1 = ((1 - sr.d * sr.Cs) / cos(thetaT - atan2(dRdq[sr_j][1], dRdq[sr_j][0]))) * w1;
 
 
 }
 
 
-void getInputValue::V2(const std::vector<double>& x_old, int sr_j) {
+void getInputValue::U2(const std::vector<double>& x_old, int sr_j) {
 
 	double dx2ds = 0.0;
 	double dx2dd = 0.0;
@@ -245,8 +245,8 @@ void getInputValue::V2(const std::vector<double>& x_old, int sr_j) {
 	double z1 = -sr.Cs1 * sr.d * tan(thetaT)
 		- sr.Cs * (1 - sr.d * sr.Cs) * ((1 + pow(sin(thetaT), 2)) / pow(cos(thetaT), 2))
 		+ pow((1 - sr.d * sr.Cs), 2) * tan(x_old[4]) / (lv * pow(cos(thetaT), 3));
-	double z2 = ((1 - sr.d * sr.Cs) * tan(thetaT)) / u1;
-	double z3 = sr.d / pow(u1, 2);
+	double z2 = ((1 - sr.d * sr.Cs) * tan(thetaT)) / w1;
+	double z3 = sr.d / pow(w1, 2);
 	double a = -1.5;
 
 	double p1, p2, p3;
@@ -255,7 +255,7 @@ void getInputValue::V2(const std::vector<double>& x_old, int sr_j) {
 	p2 = -3 * a * a;
 	p3 = a * a * a;
 
-	u2 = p1 * z1 + p2 * z2 + p3 * z3;
+	w2 = p1 * z1 + p2 * z2 + p3 * z3;
 
 
 	dx2ds = -sr.Cs2 * sr.d * tan(thetaT)
@@ -281,7 +281,7 @@ void getInputValue::V2(const std::vector<double>& x_old, int sr_j) {
 
 
 
-	v2 = a2 * (u2 - a1 * u1);
+	u2 = a2 * (w2 - a1 * w1);
 
 }
 

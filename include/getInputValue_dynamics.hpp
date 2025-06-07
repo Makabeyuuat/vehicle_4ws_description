@@ -50,8 +50,8 @@ private:
     std::array<double,2> computeRearWheelOmegas(double speed, double steeringAngle);
     std::array<double,2> computeRearWheelTorque(double Fx, double steeringAngle);
 
-    void V1(const std::vector<double>& x_old, int sr_j);
-    void V2(const std::vector<double>& x_old, int sr_j);
+    void U1(const std::vector<double>& x_old, int sr_j);
+    void U2(const std::vector<double>& x_old, int sr_j);
 
 };
 
