@@ -4,7 +4,7 @@
   <param name="robot_description" command="$(find xacro)/xacro '$(find vehicle_4ws_description)/urdf/vehicle_4ws_real.xacro'" />
 
   <!-- Gazebo にスポーン -->
-  <node pkg="gazebo_ros" type="spawn_model" name="spawn_urdf" args="-param robot_description -urdf -model vehicle_4ws -x -6.0 -y -1.0 -z 0.24 -R 0.0 -P -0.15 -Y 0.0" />
+  <node pkg="gazebo_ros" type="spawn_model" name="spawn_urdf" args="-param robot_description -urdf -model vehicle_4ws -x -6.0 -y -1.0 -z 0.29 -R 0.0 -P -0.143 -Y 0.0" />
 
   <!-- RViz の設定 -->
   <arg name="rvizconfig" default="$(find vehicle_4ws_description)/rviz/urdf.rviz"/>
@@ -16,7 +16,7 @@
            command="$(find xacro)/xacro '$(find hill_description)/urdf/hill.xacro'" />
 
     <node pkg="gazebo_ros" type="spawn_model" name="spawn_model"
-          args="-param hill_description -urdf -model hill -x -6.8 -y 0 -z 0" />
+          args="-param hill_description -urdf -model hill -x -6.9 -y 0 -z 0" />
   </group>
 
   <!-- Gazebo の空の世界を起動 -->
