@@ -281,7 +281,7 @@ void getInputValue::U2(const std::vector<double>& x_old, int sr_j) {
 
 
 
-	u2 = a2 * (w2 - a1 * w1);
+	u2 = a2 * (w2 - a1 * u1);
 
 }
 
